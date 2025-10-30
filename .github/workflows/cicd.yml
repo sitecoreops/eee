@@ -4,9 +4,9 @@ on:
   push:
     branches:
       - main
-      - 'feature/*'
-      - 'bugfix/*'
-      - 'release/*'
+      - "feature/*"
+      - "bugfix/*"
+      - "release/*"
 
 env:
   LINUX_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/eee-linux
@@ -47,11 +47,11 @@ jobs:
           - os: ubuntu-latest
             runtime: linux-x64
             repo: ghcr.io/${{ github.repository_owner }}/eee-linux
-            base_image: ''
+            base_image: ""
           - os: windows-latest
             runtime: win-x64
             repo: ghcr.io/${{ github.repository_owner }}/eee-ltsc2025
-            base_image: '/p:ContainerBaseImage=mcr.microsoft.com/dotnet/aspnet:9.0-nanoserver-ltsc2025'
+            base_image: "/p:ContainerBaseImage=mcr.microsoft.com/dotnet/aspnet:9.0-nanoserver-ltsc2025"
 
     steps:
       - name: Checkout code
@@ -60,7 +60,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -75,7 +75,7 @@ jobs:
           /t:PublishContainer
           /p:ContainerRuntimeIdentifier=${{ matrix.runtime }}
           /p:ContainerRepository=${{ matrix.repo }}
-          /p:ContainerImageTags="latest;${{ needs.get_version.outputs.version }}"
+          "/p:ContainerImageTags=latest;${{ needs.get_version.outputs.version }}"
           ${{ matrix.base_image }}
 
   create_manifest:
@@ -103,7 +103,7 @@ jobs:
 
   create_release_binaries:
     runs-on: ubuntu-latest
-    needs: get_version
+    needs: [get_version, create_manifest]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -111,7 +111,7 @@ jobs:
       - name: Set up .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '9.0.x'
+          dotnet-version: "9.0.x"
 
       - name: Publish Windows binary
         run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ./release/win-x64
@@ -123,20 +123,20 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: eee-win-x64
-          path: release/win-x64/
+          path: release/win-x64/eee.exe
 
       - name: Upload Linux binary artifact
         uses: actions/upload-artifact@v4
         with:
           name: eee-linux-x64
-          path: release/linux-x64/
+          path: release/linux-x64/eee
 
-      - name: Create Release
-        if: github.ref == 'refs/heads/main'
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: v${{ needs.get_version.outputs.version }}
-          name: v${{ needs.get_version.outputs.version }}
-          files: |
-            release/win-x64/*
-            release/linux-x64/*
+      # - name: Create Release
+      #   if: github.ref == 'refs/heads/main'
+      #   uses: softprops/action-gh-release@v2
+      #   with:
+      #     tag_name: v${{ needs.get_version.outputs.version }}
+      #     name: v${{ needs.get_version.outputs.version }}
+      #     files: |
+      #       release/win-x64/*
+      #       release/linux-x64/*
