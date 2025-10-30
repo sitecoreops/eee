@@ -157,6 +157,7 @@ jobs:
         with:
           tag_name: v${{ needs.get_version.outputs.version }}
           name: v${{ needs.get_version.outputs.version }}
+          prerelease: ${{ github.ref != 'refs/heads/main' }}
           files: |
             release/win-x64/eee.exe
             release/linux-x64/eee
