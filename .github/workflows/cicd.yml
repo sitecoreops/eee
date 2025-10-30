@@ -104,15 +104,11 @@ jobs:
 
       - name: Create and push multi-arch manifest (latest)
         run: |
-          docker image pull ${{ env.WINDOWS_IMAGE_REPO }}:latest
-          docker image pull ${{ env.LINUX_IMAGE_REPO }}:latest
           docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:latest --amend ${{ env.WINDOWS_IMAGE_REPO }}:latest --amend ${{ env.LINUX_IMAGE_REPO }}:latest
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:latest
 
       - name: Create and push multi-arch manifest (versioned)
         run: |
-          docker image pull ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
-          docker image pull ${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
           docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
 
