@@ -103,10 +103,14 @@ or with SSL:
 
 ### Usage
 
-Run a `query` with `curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"{item(path:\"/sitecore/content/tests/minimal\",language:\"en\"){id,path,name,displayName}}"}'`
+Run `query`:
 
-Run a `crawl` mutation with `curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"mutation{crawl(edgeContextId:\"<EDGE-CONTEXT-ID>\",languages:[\"en\",\"da-dk\",\"sv-se\"]){success,itemsProcessed,sitesProcessed,durationMs,message}}"}'`
+`curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"{item(path:\"/sitecore/content/tests/minimal\",language:\"en\"){id,path,name,displayName}}"}'`
+
+Run `crawl` mutation:
+
+`curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"mutation{crawl(edgeContextId:\"<EDGE-CONTEXT-ID>\",languages:[\"en\",\"da-dk\",\"sv-se\"]){success,itemsProcessed,sitesProcessed,durationMs,message}}"}'`
 
 Or open <https://localhost:5711> to use the GraphiQL UI.
 
-When you have seeded `eee` with some data, change your local head application to use <https://localhost:5711/graphql> instead of a real Experience Edge url.
+When you have seeded some data, change your local head application to use <https://localhost:5711/graphql> instead of your usual Experience Edge url.
