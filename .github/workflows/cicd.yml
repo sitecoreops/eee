@@ -48,7 +48,7 @@ jobs:
             runtime: linux-x64
             repo: ghcr.io/${{ github.repository_owner }}/eee-linux
             base_image: ""
-          - os: windows-latest
+          - os: windows-2025
             runtime: win-x64
             repo: ghcr.io/${{ github.repository_owner }}/eee-ltsc2025
             base_image: "/p:ContainerBaseImage=mcr.microsoft.com/dotnet/aspnet:9.0-nanoserver-ltsc2025"
@@ -99,11 +99,15 @@ jobs:
 
       - name: Create and push multi-arch manifest (latest)
         run: |
+          docker image pull ${{ env.WINDOWS_IMAGE_REPO }}:latest
+          docker image pull ${{ env.LINUX_IMAGE_REPO }}:latest
           docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:latest --amend ${{ env.WINDOWS_IMAGE_REPO }}:latest --amend ${{ env.LINUX_IMAGE_REPO }}:latest
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:latest
 
       - name: Create and push multi-arch manifest (versioned)
         run: |
+          docker image pull ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
+          docker image pull${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
           docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
 
