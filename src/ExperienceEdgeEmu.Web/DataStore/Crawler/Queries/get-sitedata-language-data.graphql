@@ -1,0 +1,44 @@
+query getSitesLanguageData($language: String!) {
+  site {
+    allSiteInfo {
+      total
+      results {
+        name
+        errorHandling(language: $language) {
+          notFoundPage {
+            id
+          }
+          notFoundPagePath
+          serverErrorPage {
+            id
+          }
+          serverErrorPagePath
+        }
+        dictionary(language: $language, first: 1000) {
+          pageInfo {
+            hasNext
+            endCursor
+          }
+          total
+          results {
+            key
+            value
+          }
+        }
+        routes(language: $language, first: 1000) {
+          pageInfo {
+            hasNext
+            endCursor
+          }
+          total
+          results {
+            route {
+              id
+            }
+            routePath
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+query getSitesLanguageNeutral {
+  site {
+    allSiteInfo {
+      total
+      results {
+        name
+        rootPath
+        redirects {
+          isQueryStringPreserved
+          locale
+          pattern
+          redirectType
+          target
+        }
+        hostname
+        language
+        robots
+        sitemap
+        attributes {
+          key
+          value
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+type Mutation {
+  crawl(languages: [String]!, siteNames: [String], edgeContextId: String!, edgeEndpointUrl: String): CrawlResult
+}
+
+type CrawlResult {
+  success: Boolean!
+  itemsProcessed: Int!
+  sitesProcessed: Int!
+  durationMs: Float!
+  message: String
+}

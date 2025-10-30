@@ -1,0 +1,4 @@
+https://localhost {
+	reverse_proxy eee:8080
+	tls internal
+}

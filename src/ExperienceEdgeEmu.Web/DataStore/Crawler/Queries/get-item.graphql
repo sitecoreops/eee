@@ -1,0 +1,96 @@
+fragment BasicLanguage on ItemLanguage {
+  __typename
+  name
+  displayName
+  englishName
+  nativeName
+}
+fragment BasicItem on Item {
+  __typename
+  typename: __typename
+  id
+  path
+  version
+  name
+  displayName
+  hasChildren
+
+  language {
+    ...BasicLanguage
+  }
+
+  languages {
+    language {
+      ...BasicLanguage
+    }
+  }
+
+  template {
+    id
+    baseTemplates {
+      id
+    }
+  }
+
+  url {
+    __typename
+    hostName
+    path
+    scheme
+    siteName
+    url
+  }
+
+  fields {
+    __typename
+    typename: __typename
+    id
+    name
+    value
+    jsonValue
+    definition {
+      __typename
+      id
+      type
+      name
+      section
+      sectionSortOrder
+      shared
+      sortOrder
+      source
+      title
+      unversioned
+    }
+  }
+}
+
+query getItem($path: String!, $language: String!) {
+  item(path: $path, language: $language) {
+    ...BasicItem
+
+    parent {
+      ...BasicItem
+    }
+
+    children(first: 100) {
+      pageInfo {
+        hasNext
+        endCursor
+      }
+      total
+      results {
+        ...BasicItem
+      }
+    }
+
+    ancestors {
+      ...BasicItem
+    }
+
+    rendered
+    personalization {
+      __typename
+      variantIds
+    }
+  }
+}

@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>eee</AssemblyName>
+    <StaticWebAssetsEnabled>false</StaticWebAssetsEnabled>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="data\**" />
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="data\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="data\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="data\**" />
+    <None Remove="wwwroot\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="EmuSchema\SchemaFiles\*.graphqls" />
+    <EmbeddedResource Include="DataStore\Crawler\Queries\*.graphql" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GraphQL-Parser" Version="9.5.0" />
+    <PackageReference Include="GraphQL.Client" Version="6.1.0" />
+    <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
+    <PackageReference Include="GraphQL.MemoryCache" Version="8.6.0" />
+    <PackageReference Include="GraphQL.Server.All" Version="8.3.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
+    <PackageReference Include="Serilog.Settings.AppSettings" Version="3.0.0" />
+  </ItemGroup>
+</Project>

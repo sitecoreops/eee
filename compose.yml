@@ -1,0 +1,27 @@
+services:
+  eee:
+    image: sitecoreops/eee-ltsc2025:latest
+    isolation: process
+    volumes:
+      - .\src\ExperienceEdgeEmu.Web\data:C:/app/data
+    environment:
+      - EMU__MEDIAHOST=https://localhost:42443
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/healthz"]
+      start_period: 10s
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  caddy:
+    image: caddy:latest
+    isolation: process
+    depends_on:
+      eee:
+        condition: service_healthy
+    ports:
+      - "42443:443"
+    volumes:
+      - .\docker\caddy\etc:C:/etc/caddy:ro
+      - .\docker\caddy\data:C:/data
+      - .\docker\caddy\config:C:/config
