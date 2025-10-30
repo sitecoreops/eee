@@ -92,6 +92,7 @@ jobs:
         run: docker image push ${{ matrix.repo }}:${{ needs.get_version.outputs.version }}
 
       - name: Tag and push image (latest)
+        if: github.ref == 'refs/heads/main'
         run: |
           docker image tag ${{ matrix.repo }}:${{ needs.get_version.outputs.version }} ${{ matrix.repo }}:latest
           docker image push ${{ matrix.repo }}:latest
@@ -119,15 +120,16 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Create and push multi-arch manifest (latest)
-        run: |
-          docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:latest --amend ${{ env.WINDOWS_IMAGE_REPO }}:latest --amend ${{ env.LINUX_IMAGE_REPO }}:latest
-          docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:latest
-
       - name: Create and push multi-arch manifest (versioned)
         run: |
           docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
+
+      - name: Create and push multi-arch manifest (latest)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:latest --amend ${{ env.WINDOWS_IMAGE_REPO }}:latest --amend ${{ env.LINUX_IMAGE_REPO }}:latest
+          docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:latest
 
   create_release:
     name: Create release
