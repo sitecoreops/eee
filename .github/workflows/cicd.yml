@@ -37,7 +37,7 @@ jobs:
           echo "value=$VERSION" >> $GITHUB_OUTPUT
 
   build_and_push_images:
-    name: Build and push images (${{ matrix.os }})
+    name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     needs: get_version
     permissions:
@@ -63,6 +63,7 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.0.x"
+          cache: true
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
@@ -71,7 +72,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build project as local Docker image (versioned)
+      - name: dotnet publish as local Docker image (versioned)
         run: >
           dotnet publish ${{ env.PROJECT_PATH }}
           /t:PublishContainer
@@ -88,6 +89,15 @@ jobs:
         run: |
           docker image tag ${{ matrix.repo }}:${{ needs.get_version.outputs.version }} ${{ matrix.repo }}:latest
           docker image push ${{ matrix.repo }}:latest
+
+      - name: dotnet publish binary
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -o ./release/${{ matrix.runtime }}
+
+      - name: Upload binary artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: eee-${{ matrix.runtime }}
+          path: release/${{ matrix.runtime }}
 
   create_manifest:
     name: Create Docker manifests
@@ -116,7 +126,7 @@ jobs:
   create_release:
     name: Create release
     runs-on: ubuntu-latest
-    needs: [get_version]
+    needs: [get_version, build_and_push_images]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -126,24 +136,6 @@ jobs:
         with:
           dotnet-version: "9.0.x"
           cache: true
-
-      - name: Publish Windows binary
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ./release/win-x64 --property RestoreLockedMode=true
-
-      - name: Publish Linux binary
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ./release/linux-x64 --property RestoreLockedMode=true
-
-      - name: Upload Windows binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: eee-win-x64
-          path: release/win-x64/eee.exe
-
-      - name: Upload Linux binary artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: eee-linux-x64
-          path: release/linux-x64/eee
 
       - name: Create Release
         if: github.ref == 'refs/heads/main'
