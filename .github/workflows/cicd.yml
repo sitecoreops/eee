@@ -29,10 +29,12 @@ jobs:
         id: version
         run: |
           BRANCH_NAME="${{ steps.branch-name.outputs.current_branch }}"
+          # Replace any character that is not a letter, number, or hyphen with a hyphen.
+          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr -cs 'a-zA-Z0-9-' '-')
           if [ "$BRANCH_NAME" == "main" ]; then
             VERSION="1.0.${{ github.run_number }}"
           else
-            VERSION="1.0.${{ github.run_number }}-${BRANCH_NAME}"
+            VERSION="1.0.${{ github.run_number }}-${SANITIZED_BRANCH_NAME}"
           fi
           echo "value=$VERSION" >> $GITHUB_OUTPUT
 
