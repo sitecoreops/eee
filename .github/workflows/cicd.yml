@@ -73,9 +73,13 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: dotnet restore
+        run: dotnet restore --locked-mode
+
       - name: dotnet publish as local Docker image (versioned)
         run: >
           dotnet publish ${{ env.PROJECT_PATH }}
+          -c Release
           /t:PublishContainer
           /p:RestoreLockedMode=true
           /p:ContainerRuntimeIdentifier=${{ matrix.runtime }}
