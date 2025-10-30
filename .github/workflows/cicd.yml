@@ -69,14 +69,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and publish Docker image
+      - name: Build and publish Docker image (versioned)
         run: >
           dotnet publish ${{ env.PROJECT_PATH }}
           /t:PublishContainer
           /p:ContainerRuntimeIdentifier=${{ matrix.runtime }}
           /p:ContainerRepository=${{ matrix.repo }}
-          "/p:ContainerImageTags=latest;${{ needs.get_version.outputs.version }}"
+          "/p:ContainerImageTag=${{ needs.get_version.outputs.version }}"
           ${{ matrix.base_image }}
+
+      - name: Tag and push (latest)
+        run: >
+          docker image tag ${{ matrix.repo }}:${{ needs.get_version.outputs.version }} ${{ matrix.repo }}:latest
 
   create_manifest:
     runs-on: ubuntu-latest
