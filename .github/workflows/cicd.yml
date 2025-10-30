@@ -91,7 +91,7 @@ jobs:
   create_manifest:
     name: Create Docker manifests
     runs-on: ubuntu-latest
-    needs: [get_version, build_and_push_images]
+    needs: [get_version]
     permissions:
       packages: write
     steps:
@@ -112,8 +112,8 @@ jobs:
           docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
 
-  create_release_binaries:
-    name: Create release binaries
+  create_release:
+    name: Create release
     runs-on: ubuntu-latest
     needs: [get_version, create_manifest]
     steps:
@@ -143,12 +143,12 @@ jobs:
           name: eee-linux-x64
           path: release/linux-x64/eee
 
-      # - name: Create Release
-      #   if: github.ref == 'refs/heads/main'
-      #   uses: softprops/action-gh-release@v2
-      #   with:
-      #     tag_name: v${{ needs.get_version.outputs.version }}
-      #     name: v${{ needs.get_version.outputs.version }}
-      #     files: |
-      #       release/win-x64/*
-      #       release/linux-x64/*
+      - name: Create Release
+        if: github.ref == 'refs/heads/main'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.get_version.outputs.version }}
+          name: v${{ needs.get_version.outputs.version }}
+          files: |
+            release/win-x64/*
+            release/linux-x64/*
