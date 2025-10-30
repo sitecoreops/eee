@@ -116,8 +116,6 @@ jobs:
     name: Create release
     runs-on: ubuntu-latest
     needs: [get_version]
-    permissions:
-      contents: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -153,5 +151,5 @@ jobs:
           tag_name: v${{ needs.get_version.outputs.version }}
           name: v${{ needs.get_version.outputs.version }}
           files: |
-            release/win-x64/*
-            release/linux-x64/*
+            release/win-x64/eee.exe
+            release/linux-x64/eee
