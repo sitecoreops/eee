@@ -75,6 +75,7 @@ jobs:
         run: >
           dotnet publish ${{ env.PROJECT_PATH }}
           /t:PublishContainer
+          /p:RestoreLockedMode=true
           /p:ContainerRuntimeIdentifier=${{ matrix.runtime }}
           /p:ContainerRepository=${{ matrix.repo }}
           /p:ContainerImageTag=${{ needs.get_version.outputs.version }}
