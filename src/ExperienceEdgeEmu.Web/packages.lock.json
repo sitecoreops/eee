@@ -30,27 +30,27 @@
       },
       "GraphQL.MemoryCache": {
         "type": "Direct",
-        "requested": "[8.6.0, )",
-        "resolved": "8.6.0",
-        "contentHash": "qTwXxaa1RSLnqLAZfRHYC8yYBf1YkM56xNLO+HKCnhUbIWrMbI1v8n2pzFgjNkAS5IbCv8Oo9b1Zu9s8lF1azw==",
+        "requested": "[8.7.0, )",
+        "resolved": "8.7.0",
+        "contentHash": "6KN/LsrwRjq5Lsmx2HGOlX6UjY2zat0N3Hloa2EDuXh0Xx6PBoQxJBbBIY+xK5qI2AoYpN53i10sMG0kh6Zoog==",
         "dependencies": {
-          "GraphQL": "[8.6.0, 9.0.0)",
+          "GraphQL": "[8.7.0, 9.0.0)",
           "Microsoft.Extensions.Caching.Memory": "3.1.0"
         }
       },
       "GraphQL.Server.All": {
         "type": "Direct",
-        "requested": "[8.3.1, )",
-        "resolved": "8.3.1",
-        "contentHash": "3q/I3xnHjoQjgy7kKpZJMTzNjyruRf2U1O4v9iQLH8XHl0u/3TtJv1CtDsXYXoYZ3bnudBuMdLz65XJrdTTdhg==",
+        "requested": "[8.3.2, )",
+        "resolved": "8.3.2",
+        "contentHash": "6BEuZGGKXxuXc+b3HQe/DOxA+JZtMvBlgyr2TFQl3tq9HP4LXTZkw8PG2kQfmRV+5Xm7M2JU2nrXnq0CmiD09g==",
         "dependencies": {
           "GraphQL.DataLoader": "[8.3.0, 9.0.0)",
           "GraphQL.MemoryCache": "[8.3.0, 9.0.0)",
-          "GraphQL.Server.Transports.AspNetCore": "[8.3.1, 9.0.0)",
-          "GraphQL.Server.Ui.Altair": "8.3.1",
-          "GraphQL.Server.Ui.GraphiQL": "8.3.1",
-          "GraphQL.Server.Ui.Playground": "8.3.1",
-          "GraphQL.Server.Ui.Voyager": "8.3.1"
+          "GraphQL.Server.Transports.AspNetCore": "[8.3.2, 9.0.0)",
+          "GraphQL.Server.Ui.Altair": "8.3.2",
+          "GraphQL.Server.Ui.GraphiQL": "8.3.2",
+          "GraphQL.Server.Ui.Playground": "8.3.2",
+          "GraphQL.Server.Ui.Voyager": "8.3.2"
         }
       },
       "Serilog.AspNetCore": {
@@ -80,17 +80,17 @@
       },
       "GraphQL": {
         "type": "Transitive",
-        "resolved": "8.6.0",
-        "contentHash": "Hssko835s4pfBq9mD2zV2I03/RR3Z8WXr87Ulvzeu2L2GbdSzMdFQgvoF/Jyevb5G1oJwS1+AhyUtxHG9OArZw==",
+        "resolved": "8.7.0",
+        "contentHash": "96vcU9fXSiGo5hJ7qJlw1UB4yz6SBlXOS0jrnxC5J2Drg/aTtYcfgUwo/8Dn8of0sJmCDHe954cj7Pvu2aK1fw==",
         "dependencies": {
           "GraphQL-Parser": "9.5.0",
-          "GraphQL.Analyzers": "8.6.0"
+          "GraphQL.Analyzers": "8.7.0"
         }
       },
       "GraphQL.Analyzers": {
         "type": "Transitive",
-        "resolved": "8.6.0",
-        "contentHash": "MMYCNRuBPVPe8+ajOsykbO7fPtCZ9juKExvflABR3yXssjlJAc64to4UG8FIJjQcOzodYS91y5Ld/faMY0OKgg=="
+        "resolved": "8.7.0",
+        "contentHash": "ba3fdH038eyCi8D4CcD1t9IyCYfSutPy4CHHgp3lZg2JbPJdWzmL+lNt40DJY7peN5SIfA3eKJkkntU0CV4kjQ=="
       },
       "GraphQL.Client.Abstractions": {
         "type": "Transitive",
@@ -132,8 +132,8 @@
       },
       "GraphQL.Server.Transports.AspNetCore": {
         "type": "Transitive",
-        "resolved": "8.3.1",
-        "contentHash": "4b1jVZjoh+ahEsBy9ZGAEgb0DrhqrBtM4w/pzNH7gnr541pSzE0KevXWVV2/vV090qiB7OPGnPAi2N9nWdgZCg==",
+        "resolved": "8.3.2",
+        "contentHash": "S7DlIBq39SN7M/WH2y8/m6mjNiuH05K3om0jMIInGqJrCpb33KiTJE9APxvfXgh2FAlyhiUfeBMA2rY/bYebWg==",
         "dependencies": {
           "GraphQL.MicrosoftDI": "[8.3.0, 9.0.0)",
           "GraphQL.SystemTextJson": "[8.3.0, 9.0.0)"
@@ -141,23 +141,23 @@
       },
       "GraphQL.Server.Ui.Altair": {
         "type": "Transitive",
-        "resolved": "8.3.1",
-        "contentHash": "fL3ZBuGMSc6YOJgLYCkgeIhxwVXRxYFGPOYref7YDfJ9352pSH3M7aFvEr3wBnMeLXiFm+f2kGJ8bYGA9Sf83A=="
+        "resolved": "8.3.2",
+        "contentHash": "sFD7UXqnaac/zK3ljvyeMiDcczXh6BuK1wCVDZh2Zv3OSIrsCJcAFgvwNARjiD+rPgQvp0vACjLVBtAupZLnww=="
       },
       "GraphQL.Server.Ui.GraphiQL": {
         "type": "Transitive",
-        "resolved": "8.3.1",
-        "contentHash": "Nin27zXeWFaxjqZvduwHpyrpP4qtIDGCdqKFjn9ThBWB1brhtUwNUjyKwZJTMts/O6B77SCRXHo1I4Wbe8wTmg=="
+        "resolved": "8.3.2",
+        "contentHash": "C/KJXvKlNcY38QynyTUHNjRjOaBDadDsC9t26DxwkEn1m6fV3cZZIhxY9Y9rCJj1tV8yQwCM4EsZWBloPc9cog=="
       },
       "GraphQL.Server.Ui.Playground": {
         "type": "Transitive",
-        "resolved": "8.3.1",
-        "contentHash": "Tx7e4GxIDCUs/VOQwGs7Ef1YrxXhrCVWS+GlU8I5d9V/5CXM/Jk1dgxdmmAkeu+kSlKaYPwT46f734+bdxZJUg=="
+        "resolved": "8.3.2",
+        "contentHash": "oFyOQeynaPHlivoZ+yekBaM/aUTYeHPqpd44vT8htdZ0ZpMug/agU5Xe0SWwnKdrAr0pUjjC6ATg9NNUefiWKQ=="
       },
       "GraphQL.Server.Ui.Voyager": {
         "type": "Transitive",
-        "resolved": "8.3.1",
-        "contentHash": "WyCT3XbDWJGu47KamXjCBic/HzkvzDNRIUdmwPdeuEi3xTghLr7q8myiRdM+53rqnPNSG5lqFEP1ClOSC5iF/Q=="
+        "resolved": "8.3.2",
+        "contentHash": "kGwg4EH5x13I6xcEPJI/KQXDIQ+Bf+b/JNFNzbLwJ/Qdt/D9dkafrWyF6E4SOW1aZhh0Y8rOGCYb09fJM05HRA=="
       },
       "GraphQL.SystemTextJson": {
         "type": "Transitive",

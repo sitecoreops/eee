@@ -80,8 +80,8 @@ jobs:
         run: >
           dotnet publish ${{ env.PROJECT_PATH }}
           -c Release
+          --no-restore
           /t:PublishContainer
-          /p:RestoreLockedMode=true
           /p:ContainerRuntimeIdentifier=${{ matrix.runtime }}
           /p:ContainerRepository=${{ matrix.repo }}
           /p:ContainerImageTag=${{ needs.get_version.outputs.version }}
@@ -96,7 +96,7 @@ jobs:
           docker image push ${{ matrix.repo }}:latest
 
       - name: dotnet publish binary
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -o ./release/${{ matrix.runtime }} /p:RestoreLockedMode=true
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -o ./release/${{ matrix.runtime }} --no-restore
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
