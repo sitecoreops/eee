@@ -126,12 +126,13 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "9.0.x"
+          cache: true
 
       - name: Publish Windows binary
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ./release/win-x64
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -o ./release/win-x64 --property RestoreLockedMode=true
 
       - name: Publish Linux binary
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ./release/linux-x64
+        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ./release/linux-x64 --property RestoreLockedMode=true
 
       - name: Upload Windows binary artifact
         uses: actions/upload-artifact@v4
