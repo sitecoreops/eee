@@ -114,4 +114,3 @@ Run `crawl` mutation:
 Or open <https://localhost:5711> to use the GraphiQL UI.
 
 When you have seeded some data, change your local head application to use <https://localhost:5711/graphql> instead of your usual Experience Edge url.
-
