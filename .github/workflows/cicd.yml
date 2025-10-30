@@ -84,7 +84,9 @@ jobs:
         run: docker image push ${{ matrix.repo }}:${{ needs.get_version.outputs.version }}
 
       - name: Tag and push image (latest)
-        run: docker image tag ${{ matrix.repo }}:${{ needs.get_version.outputs.version }} ${{ matrix.repo }}:latest
+        run: >
+          docker image tag ${{ matrix.repo }}:${{ needs.get_version.outputs.version }} ${{ matrix.repo }}:latest
+          docker image push ${{ matrix.repo }}:latest
 
   create_manifest:
     name: Create Docker manifests
