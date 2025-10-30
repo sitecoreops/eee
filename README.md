@@ -16,7 +16,7 @@ Lightweight Experience Edge emulator for local (offline) development and test au
 - [GraphiQL UI](https://github.com/graphql-dotnet/server) accessible on `/`.
 - Hot reloading data when files in data root is modified.
 - Health endpoint `/healthz`.
-- Docker multi platform images `docker image pull sitecoreops/eee` (runs on both Windows x64 and Linux x64).
+- Docker multi platform images `docker image pull ghcr.io/sitecoreops/eee` (runs on both Windows x64 and Linux x64).
 
 ## Data layout
 
@@ -81,15 +81,15 @@ You can run in Docker or download native binaries for Linux and Windows. Running
 
 run without SSL:
 
-`docker run -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 sitecoreops/eee`
+`docker run -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee`
 
 or with persistence:
 
-`docker run -e "EMU__DATAROOTPATH=./data" -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 sitecoreops/eee`
+`docker run -e "EMU__DATAROOTPATH=./data" -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee`
 
 or with SSL:
 
-1. Use [./compose.yml](./compose.yml) as reference, modify as needed.
+1. Use [./compose.yml](./compose.yml) as reference, modify as needed, for example change image data volumes.
 1. Then `docker compose up -d`.
 1. Make your machine trust the certificate, run `certutil -addstore -f "ROOT" ".\\docker\\caddy\\data\\caddy\\pki\\authorities\\local\\root.crt"`.
 
