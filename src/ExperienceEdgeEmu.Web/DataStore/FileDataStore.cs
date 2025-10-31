@@ -197,19 +197,23 @@ public class FileDataStore(EmuFileSystem emuFileSystem, ILogger<FileDataStore> l
                     continue;
                 }
 
+                var validRouteResults = new List<RouteResult>();
+
                 foreach (var route in siteData.Routes.Results)
                 {
                     var routeItem = GetItemById(route.Route.Id, language);
 
-                    if (routeItem is not null)
+                    if (routeItem != null)
                     {
-                        route.Route = routeItem;
+                        validRouteResults.Add(new RouteResult { Route = routeItem, RoutePath = route.RoutePath });
                     }
                     else
                     {
-                        logger.LogError("Item not found for {RoutePath}, site {Site} and language {Language}.", route.RoutePath, site.Name, language);
+                        logger.LogWarning("Item not found for route {RoutePath} and id {ItemId}, site {Site} and language {Language}.", route.RoutePath, route.Route.Id, site.Name, language);
                     }
                 }
+
+                siteData.Routes.Results = [.. validRouteResults];
             }
         }
 
