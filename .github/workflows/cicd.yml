@@ -13,6 +13,7 @@ on:
 
 env:
   LINUX_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/eee-linux
+  MACOS_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/eee-macos
   WINDOWS_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/eee-ltsc2025
   MULTIARCH_IMAGE_REPO: ghcr.io/${{ github.repository_owner }}/eee
   PROJECT_PATH: src/ExperienceEdgeEmu.Web/ExperienceEdgeEmu.Web.csproj
@@ -58,11 +59,14 @@ jobs:
             runtime: linux-x64
             repo: ghcr.io/${{ github.repository_owner }}/eee-linux
             base_image: ""
+          - os: macos-latest
+            runtime: osx-arm64
+            repo: ghcr.io/${{ github.repository_owner }}/eee-macos
+            base_image: ""
           - os: windows-2025
             runtime: win-x64
             repo: ghcr.io/${{ github.repository_owner }}/eee-ltsc2025
             base_image: "/p:ContainerBaseImage=mcr.microsoft.com/dotnet/aspnet:9.0-nanoserver-ltsc2025"
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -129,12 +133,12 @@ jobs:
 
       - name: Create and push multi-arch manifest (versioned)
         run: |
-          docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
+          docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.WINDOWS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.LINUX_IMAGE_REPO }}:${{ needs.get_version.outputs.version }} --amend ${{ env.MACOS_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:${{ needs.get_version.outputs.version }}
 
       - name: Create and push multi-arch manifest (latest)
         run: |
-          docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:latest --amend ${{ env.WINDOWS_IMAGE_REPO }}:latest --amend ${{ env.LINUX_IMAGE_REPO }}:latest
+          docker manifest create ${{ env.MULTIARCH_IMAGE_REPO }}:latest --amend ${{ env.WINDOWS_IMAGE_REPO }}:latest --amend ${{ env.LINUX_IMAGE_REPO }}:latest --amend ${{ env.MACOS_IMAGE_REPO }}:latest
           docker manifest push ${{ env.MULTIARCH_IMAGE_REPO }}:latest
 
   create_release:
@@ -150,10 +154,16 @@ jobs:
           path: release/win-x64
 
       - uses: actions/download-artifact@v5
-        name: Download artifact (linux)
+        name: Download artifact (Linux)
         with:
           name: eee-linux-x64
           path: release/linux-x64
+
+      - uses: actions/download-artifact@v5
+        name: Download artifact (macOS)
+        with:
+          name: eee-osx-arm64
+          path: release/macos-arm64
 
       - uses: softprops/action-gh-release@v2
         name: Create Release
@@ -164,3 +174,4 @@ jobs:
           files: |
             release/win-x64/eee.exe
             release/linux-x64/eee
+            release/macos-arm64/eee
