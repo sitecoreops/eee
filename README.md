@@ -34,9 +34,9 @@ Under your data root (default `./data`, configured with the `EMU__DATAROOTPATH` 
 
 > TIP: Run a `crawl` mutation to get some data to learn from
 
-## Using Experience Edge preview context id's (or local XM Cloud instances)
+## Crawling preview endpoints (preview context id's or local XM Cloud instances)
 
-Add this patch to increase Sitecore GraphQL complexity configuration:
+If you want to crawl Experience Edge with a preview context id's or a local XM Cloud instances you will hit a CM server. This requires the following patch to increase the Sitecore GraphQL complexity configuration:
 
 ```xml
 <?xml version="1.0" encoding="utf-8" ?>
