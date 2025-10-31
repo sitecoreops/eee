@@ -209,7 +209,7 @@ public class FileDataStore(EmuFileSystem emuFileSystem, ILogger<FileDataStore> l
                     }
                     else
                     {
-                        logger.LogWarning("Item not found for route {RoutePath} and id {ItemId}, site {Site} and language {Language}.", route.RoutePath, route.Route.Id, site.Name, language);
+                        logger.LogWarning("Item not found for route path {RoutePath} and id {ItemId}, site {Site} and language {Language}.", route.RoutePath, route.Route.Id, site.Name, language);
                     }
                 }
 
