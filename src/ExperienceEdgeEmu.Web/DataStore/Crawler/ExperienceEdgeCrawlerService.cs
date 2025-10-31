@@ -48,10 +48,10 @@ public class ExperienceEdgeCrawlerService
         var edgeContextId = context.GetArgument<string>("edgeContextId");
         var languages = context.GetArgument<string[]>("languages", []);
         var siteNames = context.GetArgument<string[]>("siteNames");
-
-        _logger.LogInformation("Starting crawl endpoint={EdgeEndpointUrl}, languages={Languages}, siteNames={SiteNames}.", edgeEndpointUrl, string.Join(',', languages), string.Join(',', siteNames ?? []));
-
         var client = CreateGraphQLClient(edgeEndpointUrl, edgeContextId);
+
+        _logger.LogInformation("Starting crawl endpoint={EdgeEndpointHost}, languages={Languages}, siteNames={SiteNames}.", client.Options.EndPoint?.Host, string.Join(',', languages), string.Join(',', siteNames ?? []));
+        
         var crawlPaths = new List<string>();
 
         try
