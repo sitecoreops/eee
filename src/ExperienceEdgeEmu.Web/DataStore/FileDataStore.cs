@@ -20,7 +20,7 @@ public class FileDataStore(EmuFileSystem emuFileSystem, ILogger<FileDataStore> l
             await ProcessJsonFile(filePath, cancellationToken);
         });
 
-        logger.LogInformation("Finished indexing, duration={Duration}, items={ItemCount}, sites={SitesCount},", startupWatch.Elapsed, itemStore.Count, siteDataStore.Count);
+        logger.LogInformation("Finished indexing, duration={Duration}, items={ItemCount}, sites={SitesCount}.", startupWatch.Elapsed, itemStore.Count, siteDataStore.Count);
     }
 
     private void SeedTestData()
