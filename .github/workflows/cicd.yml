@@ -24,20 +24,23 @@ jobs:
     steps:
       - name: Get branch name
         id: branch-name
-        uses: tj-actions/branch-names@v8
+        uses: tj-actions/branch-names@v9
+        with:
+          replace_slashes_with_hyphens: true
+          strip_tag_prefix: v
 
-      - name: Generate version string
+      - name: Generate version
         id: version
         run: |
-          BRANCH_NAME="${{ steps.branch-name.outputs.current_branch }}"
-          # Replace any character that is not a letter, number, or hyphen with a hyphen.
-          SANITIZED_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr -cs 'a-zA-Z0-9-' '-')
-          if [ "$BRANCH_NAME" == "main" ]; then
-            VERSION="1.0.${{ github.run_number }}"
+          IS_TAG="${{ steps.branch-name.outputs.is_tag }}"
+
+          if [ "$IS_TAG" == "true" ]; then
+            VERSION="${{ steps.branch-name.outputs.is_tag }}"
           else
-            VERSION="1.0.${{ github.run_number }}-${SANITIZED_BRANCH_NAME}"
+            VERSION="${{ steps.branch-name.outputs.current_branch }}-${{ github.run_number }}"
           fi
           echo "value=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version is: $VERSION"
 
   build:
     name: Build (${{ matrix.os }})
