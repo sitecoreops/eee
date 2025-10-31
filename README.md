@@ -120,7 +120,7 @@ curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --d
 Run `crawl` mutation:
 
 ```powershell
-curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"mutation{crawl(edgeContextId:\"<EDGE-CONTEXT-ID>\",languages:[\"en\",\"da-dk\",\"sv-se\"]){success,itemsProcessed,sitesProcessed,durationMs,message}}"}'
+curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"mutation{crawl(edgeContextId:\"<EDGE-CONTEXT-ID>\",languages:[\"en\"]){success,itemsProcessed,sitesProcessed,durationMs,message}}"}'
 ```
 
 Or open <https://localhost:5711> to use the GraphiQL UI.
