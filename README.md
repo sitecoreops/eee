@@ -2,6 +2,10 @@
 
 Lightweight Experience Edge emulator for local (offline) development and test automation.
 
+[![cicd](https://github.com/sitecoreops/eee/actions/workflows/cicd.yml/badge.svg)](https://github.com/sitecoreops/eee/actions/workflows/cicd.yml)
+[![Latest Release](https://img.shields.io/github/v/release/sitecoreops/eee)](https://github.com/sitecoreops/eee/releases/latest)
+[![Docker Image](https://img.shields.io/badge/docker-ghcr.io/sitecoreops/eee-blue)](https://ghcr.io/sitecoreops/eee)
+
 ## Features
 
 - GraphQL endpoint
