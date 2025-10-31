@@ -37,7 +37,7 @@ jobs:
           IS_TAG="${{ steps.branch-name.outputs.is_tag }}"
 
           if [ "$IS_TAG" == "true" ]; then
-            VERSION="${{ steps.branch-name.outputs.is_tag }}"
+            VERSION="${{ steps.branch-name.outputs.tag }}"
           else
             VERSION="${{ steps.branch-name.outputs.current_branch }}-${{ github.run_number }}"
           fi
