@@ -92,7 +92,7 @@ docker run -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/siteco
 or with persistence:
 
 ```powershell
-docker run -e "EMU__DATAROOTPATH=./data" -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee
+docker run -v "./data/eee:/app/data" -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee
 ```
 
 or with SSL:
