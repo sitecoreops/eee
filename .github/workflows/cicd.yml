@@ -6,7 +6,6 @@ on:
       - main
       - "feature/*"
       - "bugfix/*"
-      - "release/*"
     paths-ignore:
       - "*.md"
 
