@@ -13,7 +13,7 @@ Lightweight Experience Edge emulator for local (offline) development and test au
     - `site` queries.
     - `layout` queries.
     - `item` queries.
-    - `search` queries **NOT SUPPORTED**.
+    - `search` queries **NOT SUPPORTED**⚠️.
   - Extras:
     - `crawl` mutation, crawls existing Experience Edge endpoint to seed emulator with data and media 🚀.
 - Hosting media items.
@@ -36,7 +36,7 @@ Under your data root (default `./data`, configured with the `EMU__DATAROOTPATH` 
    ├── /*.graphqls (user schema files)
 ```
 
-> TIP: Run a `crawl` mutation to get some data to learn from
+> 💡TIP: Run a `crawl` mutation to get some data to learn from.
 
 ## Crawling preview endpoints (preview context id's or local XM Cloud instances)
 
@@ -64,7 +64,7 @@ If you want to crawl Experience Edge with a preview context id's or a local XM C
 </configuration>
 ```
 
-## Gotchas
+## Limitations & known issues
 
 Currently there a few limitations/gotchas, some may be fixed in the future:
 
@@ -85,11 +85,15 @@ You can run in Docker or download native binaries for Linux and Windows. Running
 
 run without SSL:
 
-`docker run -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee`
+```powershell
+docker run -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee
+```
 
 or with persistence:
 
-`docker run -e "EMU__DATAROOTPATH=./data" -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee`
+```powershell
+docker run -e "EMU__DATAROOTPATH=./data" -e "EMU__MEDIAHOST=http://localhost:5710" -p 5710:8080 ghcr.io/sitecoreops/eee
+```
 
 or with SSL:
 
@@ -109,11 +113,15 @@ or with SSL:
 
 Run `query`:
 
-`curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"{item(path:\"/sitecore/content/tests/minimal\",language:\"en\"){id,path,name,displayName}}"}'`
+```powershell
+curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"{item(path:\"/sitecore/content/tests/minimal\",language:\"en\"){id,path,name,displayName}}"}'
+```
 
 Run `crawl` mutation:
 
-`curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"mutation{crawl(edgeContextId:\"<EDGE-CONTEXT-ID>\",languages:[\"en\",\"da-dk\",\"sv-se\"]){success,itemsProcessed,sitesProcessed,durationMs,message}}"}'`
+```powershell
+curl -k "https://localhost:5711/graphql" -H "Content-Type: application/json" --data-raw '{"query":"mutation{crawl(edgeContextId:\"<EDGE-CONTEXT-ID>\",languages:[\"en\",\"da-dk\",\"sv-se\"]){success,itemsProcessed,sitesProcessed,durationMs,message}}"}'
+```
 
 Or open <https://localhost:5711> to use the GraphiQL UI.
 
