@@ -2,7 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace ExperienceEdgeEmu.Web.EmuSchema;
+namespace ExperienceEdgeEmu.Web.DataStore.Crawler;
 
 public class IntrospectionJsonToSdlConverter
 {
