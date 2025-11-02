@@ -30,10 +30,28 @@ public class IntrospectionToSdlConverter
                 case "SCALAR":
                     AppendScalarType(sdlBuilder, type);
                     break;
+                case "INPUT_OBJECT":
+                    AppendInputObjectType(sdlBuilder, type);
+                    break;
             }
         }
 
         return sdlBuilder.ToString();
+    }
+
+    private void AppendInputObjectType(StringBuilder sdlBuilder, IntrospectionType type)
+    {
+        if (type == null || type.Name == null || type.Name.StartsWith("__"))
+        {
+            return;
+        }
+
+        sdlBuilder.AppendLine($"input {type.Name} {{");
+
+        AppendInputFields(sdlBuilder, type.InputFields ?? []);
+
+        sdlBuilder.AppendLine("}");
+        sdlBuilder.AppendLine();
     }
 
     private void AppendObjectType(StringBuilder sdlBuilder, IntrospectionType type)
@@ -177,6 +195,30 @@ public class IntrospectionToSdlConverter
         }
     }
 
+    private void AppendInputFields(StringBuilder sdlBuilder, IEnumerable<IntrospectionInputValue> fields)
+    {
+        foreach (var field in fields ?? Array.Empty<IntrospectionInputValue>())
+        {
+            if (field?.Name == null)
+            {
+                continue;
+            }
+
+            var fieldLine = new StringBuilder();
+
+            fieldLine.Append($"  {field.Name}");
+
+            fieldLine.Append($": {FormatType(field.Type)}");
+
+            if (!string.IsNullOrEmpty(field.DefaultValue) && field.DefaultValue != "null")
+            {
+                fieldLine.Append($" = {field.DefaultValue}");
+            }
+
+            sdlBuilder.AppendLine(fieldLine.ToString());
+        }
+    }
+
     private static string EscapeString(string? input)
     {
         if (string.IsNullOrEmpty(input))
@@ -209,7 +251,7 @@ public record IntrospectionSchema([property: JsonPropertyName("__schema")] Intro
 
 public record IntrospectionSchemaDefinition(IntrospectionType[]? Types);
 
-public record IntrospectionType(IntrospectionTypeReference[]? Interfaces, string? Kind, string? Name, IntrospectionField[]? Fields, IntrospectionEnumValue[]? EnumValues);
+public record IntrospectionType(IntrospectionTypeReference[]? Interfaces, string? Kind, string? Name, IntrospectionField[]? Fields, IntrospectionEnumValue[]? EnumValues, IntrospectionInputValue[]? InputFields);
 
 public record IntrospectionField(string? Name, IntrospectionTypeReference? Type, IntrospectionInputValue[]? Args, bool? IsDeprecated, string? DeprecationReason);
 
