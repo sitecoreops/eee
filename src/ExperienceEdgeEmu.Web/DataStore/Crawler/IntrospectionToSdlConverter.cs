@@ -1,27 +1,20 @@
 using System.Text;
-using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace ExperienceEdgeEmu.Web.DataStore.Crawler;
 
-public class IntrospectionJsonToSdlConverter
+public class IntrospectionToSdlConverter
 {
-    public string ConvertJsonToSdl(string? json)
+    public string ToSdl(IntrospectionSchema schema)
     {
-        if (string.IsNullOrEmpty(json))
-        {
-            return string.Empty;
-        }
-
-        var schema = JsonSerializer.Deserialize<IntrospectionSchema>(json, JsonSerializerOptions.Web);
         var sdlBuilder = new StringBuilder();
 
-        if (schema?.Data?.Schema?.Types == null)
+        if (schema?.Schema?.Types == null)
         {
             return string.Empty;
         }
 
-        foreach (var type in schema.Data.Schema.Types)
+        foreach (var type in schema.Schema.Types)
         {
             switch (type.Kind)
             {
@@ -45,7 +38,7 @@ public class IntrospectionJsonToSdlConverter
 
     private void AppendObjectType(StringBuilder sdlBuilder, IntrospectionType type)
     {
-        if (type?.Name == null)
+        if (type == null || type.Name == null || type.Name.StartsWith("__"))
         {
             return;
         }
@@ -73,7 +66,7 @@ public class IntrospectionJsonToSdlConverter
 
     private void AppendInterfaceType(StringBuilder sdlBuilder, IntrospectionType type)
     {
-        if (type?.Name == null)
+        if (type == null || type.Name == null || type.Name.StartsWith("__"))
         {
             return;
         }
@@ -88,7 +81,7 @@ public class IntrospectionJsonToSdlConverter
 
     private void AppendEnumType(StringBuilder sdlBuilder, IntrospectionType type)
     {
-        if (type?.Name == null)
+        if (type == null || type.Name == null || type.Name.StartsWith("__"))
         {
             return;
         }
@@ -120,7 +113,7 @@ public class IntrospectionJsonToSdlConverter
 
     private void AppendScalarType(StringBuilder sdlBuilder, IntrospectionType type)
     {
-        if (type?.Name == null)
+        if (type == null || type.Name == null || type.Name.StartsWith("__"))
         {
             return;
         }
@@ -210,24 +203,19 @@ public class IntrospectionJsonToSdlConverter
     }
 
     private bool IsBuiltInScalar(string scalarName) => scalarName is "String" or "Int" or "Float" or "Boolean" or "ID";
-
-    private class IntrospectionSchema
-    {
-        public IntrospectionData? Data { get; set; }
-    }
-
-    private record IntrospectionData([property: JsonPropertyName("__schema")] IntrospectionSchemaDefinition? Schema);
-
-    private record IntrospectionSchemaDefinition(IntrospectionType[]? Types);
-
-    private record IntrospectionType(IntrospectionTypeReference[]? Interfaces, string? Kind, string? Name, IntrospectionField[]? Fields, IntrospectionEnumValue[]? EnumValues);
-
-    private record IntrospectionField(string? Name, IntrospectionTypeReference? Type, IntrospectionInputValue[]? Args, bool? IsDeprecated, string? DeprecationReason);
-
-    private record IntrospectionInputValue(string? Name, IntrospectionTypeReference? Type, string? DefaultValue);
-
-    private record IntrospectionTypeReference(string? Kind, string? Name, IntrospectionTypeReference? OfType);
-
-    private record IntrospectionEnumValue(string? Name, bool? IsDeprecated, string? DeprecationReason);
 }
+
+public record IntrospectionSchema([property: JsonPropertyName("__schema")] IntrospectionSchemaDefinition? Schema);
+
+public record IntrospectionSchemaDefinition(IntrospectionType[]? Types);
+
+public record IntrospectionType(IntrospectionTypeReference[]? Interfaces, string? Kind, string? Name, IntrospectionField[]? Fields, IntrospectionEnumValue[]? EnumValues);
+
+public record IntrospectionField(string? Name, IntrospectionTypeReference? Type, IntrospectionInputValue[]? Args, bool? IsDeprecated, string? DeprecationReason);
+
+public record IntrospectionInputValue(string? Name, IntrospectionTypeReference? Type, string? DefaultValue);
+
+public record IntrospectionTypeReference(string? Kind, string? Name, IntrospectionTypeReference? OfType);
+
+public record IntrospectionEnumValue(string? Name, bool? IsDeprecated, string? DeprecationReason);
 

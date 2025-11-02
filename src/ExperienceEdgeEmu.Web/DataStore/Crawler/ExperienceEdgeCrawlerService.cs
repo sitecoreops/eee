@@ -18,23 +18,29 @@ public class ExperienceEdgeCrawlerService
     private readonly ILogger<ExperienceEdgeCrawlerService> _logger;
     private readonly EmuFileSystem _emuFileSystem;
     private readonly ItemPostProcessingQueue _filePostProcessingQueue;
+    private readonly DynamicEmuSchema _emuSchema;
+    private readonly IntrospectionToSdlConverter _introspectionConverter;
     private int _itemsProcessed;
     private int _sitesProcessed;
     private readonly string _getItemQuery;
     private readonly string _getSitesLanguageNeutralQuery;
     private readonly string _getSitesLanguageDataQuery;
+    private readonly string _introspectionQuery;
     private readonly int _maxDegreeOfParallelism;
     private static readonly JsonSerializerOptions _fileWritingJsonSerializerOptions = new() { WriteIndented = true };
 
-    public ExperienceEdgeCrawlerService(IHttpClientFactory httpClientFactory, ILogger<ExperienceEdgeCrawlerService> logger, IOptions<EmuSettings> options, EmuFileSystem emuFileSystem, ItemPostProcessingQueue filePostProcessingQueue)
+    public ExperienceEdgeCrawlerService(IHttpClientFactory httpClientFactory, ILogger<ExperienceEdgeCrawlerService> logger, IOptions<EmuSettings> options, EmuFileSystem emuFileSystem, ItemPostProcessingQueue filePostProcessingQueue, DynamicEmuSchema emuSchema, IntrospectionToSdlConverter introspectionConverter)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
         _emuFileSystem = emuFileSystem;
         _filePostProcessingQueue = filePostProcessingQueue;
+        _emuSchema = emuSchema;
+        _introspectionConverter = introspectionConverter;
         _getItemQuery = ReadEmbeddedResource("Queries.get-item.graphql");
         _getSitesLanguageNeutralQuery = ReadEmbeddedResource("Queries.get-sitedata-language-neutral.graphql");
         _getSitesLanguageDataQuery = ReadEmbeddedResource("Queries.get-sitedata-language-data.graphql");
+        _introspectionQuery = ReadEmbeddedResource("Queries.introspection.graphql");
         _maxDegreeOfParallelism = options.Value.Crawler.MaxDegreeOfParallelism;
     }
 
@@ -51,7 +57,7 @@ public class ExperienceEdgeCrawlerService
         var client = CreateGraphQLClient(edgeEndpointUrl, edgeContextId);
 
         _logger.LogInformation("Starting crawl endpoint={EdgeEndpointHost}, languages={Languages}, siteNames={SiteNames}.", client.Options.EndPoint?.Host, string.Join(',', languages), string.Join(',', siteNames ?? []));
-        
+
         var crawlPaths = new List<string>();
 
         try
@@ -130,9 +136,35 @@ public class ExperienceEdgeCrawlerService
             await Task.Delay(500);
         }
 
+        // import SDL and reload schema
+        await ImportSdlAsync(client, context.CancellationToken);
+
+        _emuSchema.ReloadSchema();
+
+        // done
         _logger.LogInformation("Crawl finished, found {ItemsProcessed} items.", _itemsProcessed);
 
         return results;
+    }
+
+    private async Task ImportSdlAsync(GraphQLHttpClient client, CancellationToken cancellationToken)
+    {
+        var request = new GraphQLRequest
+        {
+            Query = _introspectionQuery,
+        };
+
+        var response = await client.SendQueryAsync<IntrospectionSchema>(request, cancellationToken);
+
+        EnsureSuccessGraphQLResponse(response);
+
+        var sdl = _introspectionConverter.ToSdl(response.Data);
+
+        // TODO: clever file name + edge host + apikey base64
+
+        var sdlFilePath = _emuFileSystem.MakeAbsoluteDataPath("imported-schema.graphqls");
+
+        await File.WriteAllTextAsync(sdlFilePath, sdl, cancellationToken);
     }
 
     private async Task<GetSiteDataLanguageNeutralResponse> GetSiteDataLanguageNeutralAsync(GraphQLHttpClient client, CancellationToken cancellationToken)
