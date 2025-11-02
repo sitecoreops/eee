@@ -159,10 +159,7 @@ public class ExperienceEdgeCrawlerService
         EnsureSuccessGraphQLResponse(response);
 
         var sdl = _introspectionConverter.ToSdl(response.Data);
-
-        // TODO: clever file name + edge host + apikey base64
-
-        var sdlFilePath = _emuFileSystem.MakeAbsoluteDataPath("imported-schema.graphqls");
+        var sdlFilePath = _emuFileSystem.MakeAbsoluteDataPath($"imported-schema.graphqls");
 
         await File.WriteAllTextAsync(sdlFilePath, sdl, cancellationToken);
     }
