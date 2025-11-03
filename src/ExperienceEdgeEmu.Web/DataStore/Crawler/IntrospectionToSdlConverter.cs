@@ -169,7 +169,7 @@ public class IntrospectionToSdlConverter
                         continue;
                     }
 
-                    var defaultPart = string.IsNullOrEmpty(arg.DefaultValue) ? string.Empty : $" = {arg.DefaultValue}";
+                    var defaultPart = string.IsNullOrEmpty(arg.DefaultValue) || arg.DefaultValue == "null" ? string.Empty : $" = {arg.DefaultValue}"; // on preview endpoints null can be a string value
 
                     fieldLine.Append($"{arg.Name}: {FormatType(arg.Type)}{defaultPart}");
 
@@ -210,7 +210,7 @@ public class IntrospectionToSdlConverter
 
             fieldLine.Append($": {FormatType(field.Type)}");
 
-            if (!string.IsNullOrEmpty(field.DefaultValue) && field.DefaultValue != "null")
+            if (!string.IsNullOrEmpty(field.DefaultValue) && field.DefaultValue != "null") // on preview endpoints null can be a string value
             {
                 fieldLine.Append($" = {field.DefaultValue}");
             }
