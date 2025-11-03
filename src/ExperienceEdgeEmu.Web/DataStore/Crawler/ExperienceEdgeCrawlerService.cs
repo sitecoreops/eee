@@ -1,5 +1,6 @@
 
 using ExperienceEdgeEmu.Web.EmuSchema;
+using ExperienceEdgeEmu.Web.Media;
 using GraphQL;
 using GraphQL.Client.Http;
 using GraphQL.Client.Serializer.SystemTextJson;
@@ -18,6 +19,7 @@ public class ExperienceEdgeCrawlerService
     private readonly ILogger<ExperienceEdgeCrawlerService> _logger;
     private readonly EmuFileSystem _emuFileSystem;
     private readonly ItemPostProcessingQueue _filePostProcessingQueue;
+    private readonly MediaDownloadQueue _mediaDownloadQueue;
     private readonly DynamicEmuSchema _emuSchema;
     private readonly IntrospectionToSdlConverter _introspectionConverter;
     private int _itemsProcessed;
@@ -29,12 +31,20 @@ public class ExperienceEdgeCrawlerService
     private readonly int _maxDegreeOfParallelism;
     private static readonly JsonSerializerOptions _fileWritingJsonSerializerOptions = new() { WriteIndented = true };
 
-    public ExperienceEdgeCrawlerService(IHttpClientFactory httpClientFactory, ILogger<ExperienceEdgeCrawlerService> logger, IOptions<EmuSettings> options, EmuFileSystem emuFileSystem, ItemPostProcessingQueue filePostProcessingQueue, DynamicEmuSchema emuSchema, IntrospectionToSdlConverter introspectionConverter)
+    public ExperienceEdgeCrawlerService(IHttpClientFactory httpClientFactory,
+        ILogger<ExperienceEdgeCrawlerService> logger,
+        IOptions<EmuSettings> options,
+        EmuFileSystem emuFileSystem,
+        ItemPostProcessingQueue filePostProcessingQueue,
+        MediaDownloadQueue mediaDownloadQueue,
+        DynamicEmuSchema emuSchema,
+        IntrospectionToSdlConverter introspectionConverter)
     {
         _httpClientFactory = httpClientFactory;
         _logger = logger;
         _emuFileSystem = emuFileSystem;
         _filePostProcessingQueue = filePostProcessingQueue;
+        _mediaDownloadQueue = mediaDownloadQueue;
         _emuSchema = emuSchema;
         _introspectionConverter = introspectionConverter;
         _getItemQuery = ReadEmbeddedResource("Queries.get-item.graphql");
@@ -129,9 +139,18 @@ public class ExperienceEdgeCrawlerService
 
         var results = new CrawlResult(true, _itemsProcessed, _sitesProcessed, watch.Elapsed.TotalMilliseconds);
 
+        // wait on file post processing
         while (!_filePostProcessingQueue.IsEmpty())
         {
             _logger.LogInformation("File post processing queue is not empty, waiting...");
+
+            await Task.Delay(500);
+        }
+
+        // wait on media downloads
+        while (!_mediaDownloadQueue.IsEmpty())
+        {
+            _logger.LogInformation("Media download queue is not empty, waiting...");
 
             await Task.Delay(500);
         }
@@ -159,7 +178,7 @@ public class ExperienceEdgeCrawlerService
         EnsureSuccessGraphQLResponse(response);
 
         var sdl = _introspectionConverter.ToSdl(response.Data);
-        var sdlFilePath = _emuFileSystem.MakeAbsoluteDataPath($"imported-schema.graphqls");
+        var sdlFilePath = _emuFileSystem.GetImportedSchemaFilePath();
 
         await File.WriteAllTextAsync(sdlFilePath, sdl, cancellationToken);
     }
