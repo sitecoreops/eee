@@ -25,6 +25,17 @@ public class EmuFileSystem
         }
 
         _dataRootPath = Path.GetFullPath(_dataRootPath);
+
+        // disable old schema files from before we had automatic import
+        foreach (var schemaFilePath in GetSchemaFilePaths())
+        {
+            if (schemaFilePath.Equals(GetImportedSchemaFilePath(), StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
+            File.Move(schemaFilePath, schemaFilePath + ".disabled");
+        }
     }
 
     public FileSystemWatcher CreateJsonFileWatcher()
@@ -59,6 +70,13 @@ public class EmuFileSystem
         EnsureDataRootPathExists();
 
         return Directory.GetFiles(_dataRootPath, "*.json", SearchOption.AllDirectories);
+    }
+
+    public string GetImportedSchemaFilePath()
+    {
+        EnsureDataRootPathExists();
+
+        return MakeAbsoluteDataPath("imported-schema.graphqls");
     }
 
     public string MakeAbsoluteDataPath(string relativePath) => Path.Combine(_dataRootPath, relativePath);

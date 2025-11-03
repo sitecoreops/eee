@@ -11,4 +11,6 @@ public class MediaDownloadQueue
     public ValueTask QueueMessageAsync(MediaDownloadMessage message) => _channel.Writer.WriteAsync(message);
 
     public IAsyncEnumerable<MediaDownloadMessage> DequeueAllAsync(CancellationToken cancellationToken) => _channel.Reader.ReadAllAsync(cancellationToken);
+
+    public bool IsEmpty() => _channel.Reader.Count == 0;
 }

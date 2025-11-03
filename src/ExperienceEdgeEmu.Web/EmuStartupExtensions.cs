@@ -23,7 +23,8 @@ public static partial class EmuStartupExtensions
         services.AddSingleton<InMemoryItemStore>();
         services.AddSingleton<InMemorySiteDataStore>();
         services.AddSingleton<FileDataStore>();
-        services.AddSingleton<ExperienceEdgeCrawlerService>();
+        services.AddSingleton<IntrospectionToSdlConverter>();
+        services.AddScoped<ExperienceEdgeCrawlerService>();
         services.AddSingleton<ItemPostProcessingQueue>();
         services.AddSingleton<MediaUrlReplacer>();
         services.AddHostedService<ItemPostProcessingWorker>();
@@ -38,6 +39,7 @@ public static partial class EmuStartupExtensions
         services.AddHostedService<JsonFileChangeWorker>();
 
         services.AddGraphQL(b => b
+          .AddSchema<DynamicEmuSchema>()
           .AddSystemTextJson()
           .UseMemoryCache(options =>
            {

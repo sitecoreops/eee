@@ -1,24 +1,32 @@
 ﻿namespace ExperienceEdgeEmu.Web.EmuSchema;
 
-public class SdlBuilder(EmuFileSystem emuFileSystem, SchemaMerger schemaMerger)
+public class SdlBuilder(EmuFileSystem emuFileSystem, SchemaMerger schemaMerger, ILogger<SdlBuilder> logger)
 {
     public bool CustomSchemaExists { get; private set; }
 
     public string Build()
     {
-        var cleanExperienceEdgeSchema = ReadEmbeddedResource("SchemaFiles.clean-schema.graphqls");
+        var defaultExperienceEdgeSchema = ReadEmbeddedResource("SchemaFiles.default-ee-schema.graphqls");
         var emuSchema = ReadEmbeddedResource("SchemaFiles.emu-schema.graphqls");
-        var userSchemas = string.Empty;
+        var activeSchema = defaultExperienceEdgeSchema;
 
-        // load all custom schema files
-        foreach (var file in emuFileSystem.GetSchemaFilePaths())
+        // load imported schema if exists
+        var importedSchemaFilePath = emuFileSystem.GetImportedSchemaFilePath();
+
+        if (File.Exists(importedSchemaFilePath))
         {
-            userSchemas += File.ReadAllText(file);
+            activeSchema = File.ReadAllText(importedSchemaFilePath);
 
             CustomSchemaExists = true;
+
+            logger.LogInformation("Active Experience Edge schema: {ActiveSchemaFilePath}", importedSchemaFilePath);
+        }
+        else
+        {
+            logger.LogInformation("Active Experience Edge schema: default");
         }
 
-        return schemaMerger.Merge(cleanExperienceEdgeSchema, userSchemas, emuSchema);
+        return schemaMerger.Merge(activeSchema, emuSchema);
     }
 
     private string ReadEmbeddedResource(string name)
