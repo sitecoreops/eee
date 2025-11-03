@@ -33,7 +33,7 @@ Under your data root (default `./data`, configured with the `EMU__DATAROOTPATH` 
          ├── /**/<language>.json (language specific siteInfo data such as dictionary and routes)
          ├── sitedata.json (SiteData.allSiteInfo is stored here )
    ├── /media/** (stored as the media path)
-   ├── /*.graphqls (user schema files)
+   ├── /imported-schema.graphqls (will be create first time the crawl mutation is executed)
 ```
 
 > 💡TIP: Run a `crawl` mutation to get some data to learn from.
@@ -68,10 +68,6 @@ If you want to crawl Experience Edge with a preview context id's or a local XM C
 
 Currently there a few limitations/gotchas, some may be fixed in the future:
 
-1. You need to supply your own GraphQL schema in SDL format if you are using `... on <TEMPLATE_NAME>` in your queries.
-   1. Download your own SDL from <https://edge.sitecorecloud.io/api/graphql/ide>.
-   1. Place your SDL in `./data/user-schema.graphqls` (notice the file extension).
-   1. Start `eee` and **fix any errors reported**, unfortunately the SDL downloaded from edge contains a few invalid lines that can't be parsed.
 1. When running `eee` in Docker, you cannot crawl a local XM Cloud instance unless they share a Docker network.
 1. Using the `maxWidth` and `maxHeight` on `src` property fields does nothing.
 1. `SiteInfo.RoutesResult` only supports the `language` and `first` parameters, `excludedPaths` and `includePaths` does nothing and `after` throws `NotSupportedException`.
