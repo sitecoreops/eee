@@ -1,6 +1,6 @@
 # 🪶 Experience Edge Emu (EEE) 🪶
 
-Lightweight Experience Edge emulator for local (offline) cross-platform development and test automation.
+Lightweight Sitecore Experience Edge emulator for local (offline) cross-platform development and test automation.
 
 [![cicd](https://github.com/sitecoreops/experience-edge-emu/actions/workflows/cicd.yml/badge.svg)](https://github.com/sitecoreops/experience-edge-emu/actions/workflows/cicd.yml)
 [![Latest Release](https://img.shields.io/github/v/release/sitecoreops/experience-edge-emu)](https://github.com/sitecoreops/experience-edge-emu/releases/latest)
