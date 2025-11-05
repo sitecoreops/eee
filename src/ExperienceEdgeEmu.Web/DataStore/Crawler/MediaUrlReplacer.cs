@@ -5,7 +5,7 @@ namespace ExperienceEdgeEmu.Web.DataStore.Crawler;
 
 public partial class MediaUrlReplacer
 {
-    [GeneratedRegex(@"(?:https?:\/\/[^\s\""]+)?(\/-\/media\/Project\/[^\s\""]+)", RegexOptions.IgnoreCase)]
+    [GeneratedRegex(@"(?:https?:\/\/[^\s\""]+)?(\/-\/media\/[^\s\""]+)", RegexOptions.IgnoreCase)]
     private static partial Regex MediaRegex();
 
     public Dictionary<string, string> ReplaceMediaUrlsInFields(JsonNode? node, string baseUrl)
@@ -16,6 +16,8 @@ public partial class MediaUrlReplacer
 
         return changes;
     }
+
+    private bool CouldBeMediaUrl(string s) => s.StartsWith("https://edge.sitecorecloud.io/", StringComparison.OrdinalIgnoreCase) || s.Contains("/-/media/", StringComparison.OrdinalIgnoreCase);
 
     private void ReplaceMediaUrlsInFieldsInternal(JsonNode? node, string baseUrl, Dictionary<string, string> changes)
     {
@@ -63,7 +65,7 @@ public partial class MediaUrlReplacer
 
             if (value is JsonValue val && val.TryGetValue(out string? s) && s is not null)
             {
-                if (s.Contains("/-/media/Project/", StringComparison.OrdinalIgnoreCase))
+                if (CouldBeMediaUrl(s))
                 {
                     foreach (Match m in MediaRegex().Matches(s))
                     {
@@ -103,7 +105,7 @@ public partial class MediaUrlReplacer
 
             if (v is JsonValue val && val.TryGetValue(out string? s) && s is not null)
             {
-                if (s.Contains("/-/media/Project/", StringComparison.OrdinalIgnoreCase))
+                if (CouldBeMediaUrl(s))
                 {
                     foreach (Match m in MediaRegex().Matches(s))
                     {
