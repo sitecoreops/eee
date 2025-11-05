@@ -70,7 +70,7 @@ public partial class MediaUrlRewriter(IOptions<EmuSettings> options)
         }
 
         // skip if url contains .ashx which happens on urls that are not media urls
-        if (url.EndsWith(".ashx", StringComparison.OrdinalIgnoreCase))
+        if (url.Contains(".ashx", StringComparison.OrdinalIgnoreCase))
         {
             return url;
         }

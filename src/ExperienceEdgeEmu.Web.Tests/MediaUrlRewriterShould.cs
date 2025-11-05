@@ -37,6 +37,9 @@ public class MediaUrlRewriterShould
     [InlineData("/hello.jpg", "/hello.jpg")]
     [InlineData("https://edge.sitecorecloud.io/media/Feature/JSS-Experience-Accelerator/Basic-Site/banner-image.jpg?h=2001&iar=0&w=3000",
         "https://edge.sitecorecloud.io/media/Feature/JSS-Experience-Accelerator/Basic-Site/banner-image.jpg?h=2001&iar=0&w=3000")]
+    [InlineData(
+        "https://edge.sitecorecloud.io/tenant/media/Feature/JSS-Experience-Accelerator/Basic-Site.ashx?ttc=63897971991&tt=4E5E3872E3535141CBEE88AF6CFE48F0",
+        "https://edge.sitecorecloud.io/tenant/media/Feature/JSS-Experience-Accelerator/Basic-Site.ashx?ttc=63897971991&tt=4E5E3872E3535141CBEE88AF6CFE48F0")]
     public void NotRewriteValuesContainingNonNotSitecoreMediaUrl(string inputUrl, string expectedUrl)
     {
         //// arrange
