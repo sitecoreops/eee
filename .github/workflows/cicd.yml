@@ -84,9 +84,17 @@ jobs:
       - name: dotnet restore
         run: dotnet restore --locked-mode
 
+      - name: dotnet build
+        run: dotnet build -c Release
+
+      - name: dotnet test
+        run: dotnet test -c Release --no-build --no-restore
+
       - name: dotnet publish as local Docker image (versioned)
         run: >
           dotnet publish ${{ env.PROJECT_PATH }}
+          --no-build
+          --no-restore
           -c Release
           /t:PublishContainer
           /p:ContainerRuntimeIdentifier=${{ matrix.runtime }}

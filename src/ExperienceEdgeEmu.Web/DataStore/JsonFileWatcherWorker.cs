@@ -42,6 +42,7 @@ public class JsonFileWatcherWorker(ILogger<JsonFileWatcherWorker> logger, EmuFil
         _watcher.Renamed += OnRenamed;
         _watcher.Error += OnError;
         _watcher.EnableRaisingEvents = true;
+        _watcher.InternalBufferSize *= 2;
 
         logger.LogInformation("File watcher started on {Path}.", _watcher.Path);
     }
@@ -81,7 +82,7 @@ public class JsonFileWatcherWorker(ILogger<JsonFileWatcherWorker> logger, EmuFil
     private void OnDebounceTimer(object? state)
     {
         var now = DateTime.UtcNow;
-        
+
         foreach (var kvp in _eventTimes)
         {
             var info = kvp.Value;
@@ -112,7 +113,7 @@ public class JsonFileWatcherWorker(ILogger<JsonFileWatcherWorker> logger, EmuFil
 
     private void OnHealthCheck(object? state)
     {
-        
+
         try
         {
             if (_watcher is null || !_watcher.EnableRaisingEvents)

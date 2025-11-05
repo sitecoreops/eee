@@ -1,12 +1,10 @@
 ﻿using ExperienceEdgeEmu.Web.Media;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace ExperienceEdgeEmu.Web.DataStore.Crawler;
 
-public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProcessingQueue, MediaDownloadQueue mediaDownloadQueue, ILogger<ItemPostProcessingWorker> logger, MediaUrlReplacer mediaUrlReplacer, IOptions<EmuSettings> options) : BackgroundService
+public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProcessingQueue, MediaDownloadQueue mediaDownloadQueue, ILogger<ItemPostProcessingWorker> logger, JsonMediaUrlReplacer mediaUrlReplacer) : BackgroundService
 {
-    private readonly EmuSettings _settings = options.Value;
     private static readonly JsonSerializerOptions _fileWritingJsonSerializerOptions = new() { WriteIndented = true };
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -18,12 +16,12 @@ public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProces
             try
             {
                 // replace media urls
-                var changes = mediaUrlReplacer.ReplaceMediaUrlsInFields(message.JsonData, _settings.MediaHost);
+                var changes = mediaUrlReplacer.ReplaceMediaUrlsInFields(message.JsonData);
 
                 if (changes.Count > 0)
                 {
                     // save the modified json data
-                    await using var stream = File.Create(message.FilePath);
+                    using var stream = await CreateFileWithRetryAsync(message.FilePath);
 
                     await JsonSerializer.SerializeAsync(stream, new { data = new { item = message.JsonData } }, _fileWritingJsonSerializerOptions, stoppingToken);
 
@@ -42,6 +40,27 @@ public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProces
             catch (Exception ex)
             {
                 logger.LogError(ex, "File post processing failed for file {FilePath}.", message.FilePath);
+            }
+        }
+    }
+
+    public async Task<Stream> CreateFileWithRetryAsync(string filePath, int maxRetries = 3, int delayMs = 100)
+    {
+        var attempt = 0;
+
+        while (true)
+        {
+            try
+            {
+                return File.Create(filePath);
+            }
+            catch (IOException) when (attempt < maxRetries)
+            {
+                logger.LogWarning("Attempt {Attempt} to write to {FilePath} failed, retrying...", attempt, filePath);
+
+                attempt++;
+
+                await Task.Delay(delayMs);
             }
         }
     }
