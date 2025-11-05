@@ -17,7 +17,7 @@ public partial class MediaUrlReplacer
         return changes;
     }
 
-    private bool CouldBeMediaUrl(string s) => s.StartsWith("https://edge.sitecorecloud.io/", StringComparison.OrdinalIgnoreCase) || s.Contains("/-/media/", StringComparison.OrdinalIgnoreCase);
+    private bool CouldBeMediaUrl(string value) => value.Contains("https://edge.sitecorecloud.io/", StringComparison.OrdinalIgnoreCase) || value.Contains("/-/media/", StringComparison.OrdinalIgnoreCase);
 
     private void ReplaceMediaUrlsInFieldsInternal(JsonNode? node, string baseUrl, Dictionary<string, string> changes)
     {
