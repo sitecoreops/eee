@@ -3,35 +3,31 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace ExperienceEdgeEmu.Web.Media;
 
-public class MediaDownloadWorker(MediaDownloadQueue _queue, ILogger<MediaDownloadWorker> _logger, EmuFileSystem _emuFileSystem, IHttpClientFactory _httpClientFactory, IMemoryCache _processedMedia) : BackgroundService
+public class MediaDownloadWorker(MediaDownloadQueue queue, ILogger<MediaDownloadWorker> logger, EmuFileSystem emuFileSystem, IHttpClientFactory httpClientFactory, IMemoryCache processedMedia) : BackgroundService
 {
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        await foreach (var message in _queue.DequeueAllAsync(stoppingToken))
+        await foreach (var message in queue.DequeueAllAsync(stoppingToken))
         {
-            var mediaUrl = message.Url;
-
             try
             {
-                var uri = new Uri(mediaUrl, UriKind.RelativeOrAbsolute);
-
-                if (!uri.IsAbsoluteUri)
+                if (!message.Original.IsAbsoluteUri)
                 {
-                    _logger.LogWarning("Skipping relative url: {MediaUrl}.", mediaUrl);
+                    logger.LogWarning("Skipping relative url: {MediaOrignalUri}.", message.Original);
 
                     continue;
                 }
 
-                var key = uri.GetLeftPart(UriPartial.Path);
+                var mediaKey = $"{nameof(MediaDownloadWorker)}:{message.Original.GetLeftPart(UriPartial.Path)}";
 
-                if (_processedMedia.TryGetValue(key, out _))
+                if (processedMedia.TryGetValue(mediaKey, out _))
                 {
-                    _logger.LogDebug("Media {MediaUrl} has already been processed, skipping.", mediaUrl);
+                    logger.LogDebug("Media {MediaOrignalUri} has already been processed, skipping.", message.Original);
 
                     continue;
                 }
 
-                var filePath = _emuFileSystem.GetMediaFilePath(uri);
+                var filePath = emuFileSystem.GetMediaFilePath(message.New);
                 var directory = Directory.GetParent(filePath)!.FullName;
 
                 if (!Directory.Exists(directory))
@@ -39,16 +35,14 @@ public class MediaDownloadWorker(MediaDownloadQueue _queue, ILogger<MediaDownloa
                     Directory.CreateDirectory(directory);
                 }
 
-                _logger.LogInformation("Downloading media {MediaUrl} into {FilePath}.", mediaUrl, filePath);
+                logger.LogInformation("Downloading media {MediaOrignalUri} into {FilePath}.", message.Original, filePath);
 
-                using (var mediaStream = await _httpClientFactory.CreateClient().GetStreamAsync(uri, stoppingToken))
-                {
-                    using var fileStream = new FileStream(filePath, FileMode.Create);
+                using var mediaStream = await httpClientFactory.CreateClient().GetStreamAsync(message.Original, stoppingToken);
+                using var fileStream = new FileStream(filePath, FileMode.Create);
 
-                    await mediaStream.CopyToAsync(fileStream, stoppingToken);
-                }
+                await mediaStream.CopyToAsync(fileStream, stoppingToken);
 
-                _processedMedia.GetOrCreate(key, entry =>
+                processedMedia.GetOrCreate(mediaKey, entry =>
                 {
                     entry.SetSlidingExpiration(TimeSpan.FromMinutes(30));
 
@@ -57,7 +51,7 @@ public class MediaDownloadWorker(MediaDownloadQueue _queue, ILogger<MediaDownloa
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Media download failed for {MediaUrl}.", mediaUrl);
+                logger.LogError(ex, "Media download failed for {MediaOrignalUri}.", message.Original);
             }
         }
     }

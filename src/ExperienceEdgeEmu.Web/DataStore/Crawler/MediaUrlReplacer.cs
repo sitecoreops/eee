@@ -1,12 +1,16 @@
-﻿using System.Text.Json.Nodes;
+﻿using Microsoft.Extensions.Caching.Memory;
+using System.Text.Json.Nodes;
 using System.Text.RegularExpressions;
 
 namespace ExperienceEdgeEmu.Web.DataStore.Crawler;
 
-public partial class MediaUrlReplacer
+public partial class MediaUrlReplacer(IMemoryCache processedMediaUrls)
 {
-    [GeneratedRegex(@"(?:https?:\/\/[^\s\""]+)?(\/-\/media\/Project\/[^\s\""]+)", RegexOptions.IgnoreCase)]
-    private static partial Regex MediaRegex();
+    [GeneratedRegex(@"(?:https?:\/\/[^\s""\/]+)?(\/-\/(?:media|jssmedia)\/[^\s""?\)]+)", RegexOptions.IgnoreCase)]
+    private static partial Regex PreviewMediaRegex();
+
+    [GeneratedRegex(@"https?:\/\/edge\.sitecorecloud\.io\/[^\/]+\/(media\/[^\s\""\?]+)", RegexOptions.IgnoreCase)]
+    private static partial Regex EdgeMediaRegex();
 
     public Dictionary<string, string> ReplaceMediaUrlsInFields(JsonNode? node, string baseUrl)
     {
@@ -45,13 +49,67 @@ public partial class MediaUrlReplacer
         }
         else if (node is JsonArray arr)
         {
-            for (var i = 0; i < arr.Count; i++)
+            foreach (var child in arr)
             {
-                var child = arr[i];
-
                 ReplaceMediaUrlsInFieldsInternal(child, baseUrl, changes);
             }
         }
+    }
+
+    private bool TryReplaceMediaUrl(string value, string baseUrl, Dictionary<string, string> changes, out string? replaced)
+    {
+        replaced = null;
+        var wasReplaced = false;
+        var valueKey = $"{nameof(MediaUrlReplacer)}:{value}";
+
+        if (processedMediaUrls.TryGetValue(value, out replaced))
+        {
+            return true;
+        }
+
+        // skip if value does not look like media urls from edge or preview instances
+        if (!value.Contains(".sitecorecloud.io/", StringComparison.OrdinalIgnoreCase) && !value.Contains("/-/media/", StringComparison.OrdinalIgnoreCase) && !value.Contains("/-/jssmedia/", StringComparison.OrdinalIgnoreCase))
+        {
+            return wasReplaced;
+        }
+
+        // skip if value contains .ashx which happens on urls that are not media urls
+        if (value.Contains(".ashx", StringComparison.OrdinalIgnoreCase))
+        {
+            return wasReplaced;
+        }
+
+        var tempString = value;
+
+        if (EdgeMediaRegex().Match(value).Success)
+        {
+            var edgePattern = $"{baseUrl.TrimEnd('/')}/-/$1";
+
+            tempString = EdgeMediaRegex().Replace(tempString, edgePattern);
+        }
+        else if (PreviewMediaRegex().Match(value).Success)
+        {
+            var relativePattern = $"{baseUrl.TrimEnd('/')}$1";
+
+            tempString = PreviewMediaRegex().Replace(tempString, relativePattern);
+        }
+
+        if (!string.Equals(value, tempString, StringComparison.Ordinal))
+        {
+            changes.TryAdd(value, tempString);
+
+            replaced = tempString;
+            wasReplaced = true;
+
+            processedMediaUrls.GetOrCreate(valueKey, entry =>
+            {
+                entry.SetSlidingExpiration(TimeSpan.FromHours(30));
+
+                return true;
+            });
+        }
+
+        return wasReplaced;
     }
 
     private void ReplaceStringsRecursivelyInObject(JsonObject obj, string baseUrl, Dictionary<string, string> changes)
@@ -63,25 +121,9 @@ public partial class MediaUrlReplacer
 
             if (value is JsonValue val && val.TryGetValue(out string? s) && s is not null)
             {
-                if (s.Contains("/-/media/Project/", StringComparison.OrdinalIgnoreCase))
+                if (TryReplaceMediaUrl(s, baseUrl, changes, out var replaced))
                 {
-                    foreach (Match m in MediaRegex().Matches(s))
-                    {
-                        var originalUrl = m.Value;
-                        var newUrl = MediaRegex().Replace(originalUrl, $"{baseUrl.TrimEnd('/')}$1");
-
-                        if (!string.Equals(originalUrl, newUrl, StringComparison.Ordinal))
-                        {
-                            changes.TryAdd(originalUrl, newUrl);
-                        }
-                    }
-
-                    var replaced = MediaRegex().Replace(s, $"{baseUrl.TrimEnd('/')}$1");
-
-                    if (!string.Equals(replaced, s, StringComparison.Ordinal))
-                    {
-                        obj[key] = replaced;
-                    }
+                    obj[key] = replaced;
                 }
             }
             else if (value is JsonObject childObj)
@@ -103,25 +145,9 @@ public partial class MediaUrlReplacer
 
             if (v is JsonValue val && val.TryGetValue(out string? s) && s is not null)
             {
-                if (s.Contains("/-/media/Project/", StringComparison.OrdinalIgnoreCase))
+                if (TryReplaceMediaUrl(s, baseUrl, changes, out var replaced))
                 {
-                    foreach (Match m in MediaRegex().Matches(s))
-                    {
-                        var originalUrl = m.Value;
-                        var newUrl = MediaRegex().Replace(originalUrl, $"{baseUrl.TrimEnd('/')}$1");
-
-                        if (!string.Equals(originalUrl, newUrl, StringComparison.Ordinal))
-                        {
-                            changes.TryAdd(originalUrl, newUrl);
-                        }
-                    }
-
-                    var replaced = MediaRegex().Replace(s, $"{baseUrl.TrimEnd('/')}$1");
-
-                    if (!string.Equals(replaced, s, StringComparison.Ordinal))
-                    {
-                        arr[i] = replaced;
-                    }
+                    arr[i] = replaced;
                 }
             }
             else if (v is JsonObject childObj)

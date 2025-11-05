@@ -32,7 +32,10 @@ public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProces
                     // queue download media messages
                     foreach (var change in changes)
                     {
-                        await mediaDownloadQueue.QueueMessageAsync(new MediaDownloadMessage(change.Key));
+                        var originalUri = new Uri(change.Key, UriKind.RelativeOrAbsolute);
+                        var newUri = new Uri(change.Value, UriKind.RelativeOrAbsolute);
+
+                        await mediaDownloadQueue.QueueMessageAsync(new MediaDownloadMessage(originalUri, newUri));
                     }
                 }
             }

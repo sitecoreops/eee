@@ -2,7 +2,7 @@
 
 namespace ExperienceEdgeEmu.Web.Media;
 
-public record MediaDownloadMessage(string Url);
+public record MediaDownloadMessage(Uri Original, Uri New);
 
 public class MediaDownloadQueue
 {

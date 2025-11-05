@@ -68,7 +68,7 @@ If you want to crawl Experience Edge with a preview context id's or a local XM C
 
 Currently there a few limitations/gotchas, some may be fixed in the future:
 
-1. When running `eee` in Docker, you cannot crawl a local XM Cloud instance unless they share a Docker network.
+1. When running `eee` in Docker, you cannot crawl a local XM Cloud instance *unless* they share the same Docker network.
 1. Using the `maxWidth` and `maxHeight` on `src` property fields does nothing.
 1. `SiteInfo.RoutesResult` only supports the `language` and `first` parameters, `excludedPaths` and `includePaths` does nothing and `after` throws `NotSupportedException`.
 1. `SiteInfo.DictionaryResult` only supports the `language` and `first` parameters, `after` throws `NotSupportedException`.
