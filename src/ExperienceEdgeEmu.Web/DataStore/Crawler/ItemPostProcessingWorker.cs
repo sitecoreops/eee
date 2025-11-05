@@ -52,11 +52,12 @@ public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProces
         {
             try
             {
-
                 return File.Create(filePath);
             }
             catch (IOException) when (attempt < maxRetries)
             {
+                logger.LogWarning("Attempt {Attempt} to write to {FilePath} failed, retrying...", attempt, filePath);
+
                 attempt++;
 
                 await Task.Delay(delayMs);
