@@ -37,7 +37,8 @@ public class MediaDownloadWorker(MediaDownloadQueue queue, ILogger<MediaDownload
 
                 logger.LogInformation("Downloading media {MediaOrignalUri} into {FilePath}.", message.Original, filePath);
 
-                using var mediaStream = await httpClientFactory.CreateClient().GetStreamAsync(message.Original, stoppingToken);
+                var client = httpClientFactory.CreateClient(StringConstants.EmuHttpClientName);
+                using var mediaStream = await client.GetStreamAsync(message.Original, stoppingToken);
                 using var fileStream = new FileStream(filePath, FileMode.Create);
 
                 await mediaStream.CopyToAsync(fileStream, stoppingToken);

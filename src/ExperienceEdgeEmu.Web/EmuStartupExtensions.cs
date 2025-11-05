@@ -6,6 +6,8 @@ using GraphQL;
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Types;
 using Microsoft.AspNetCore.StaticFiles;
+using Microsoft.Extensions.Http.Resilience;
+using Polly;
 
 namespace ExperienceEdgeEmu.Web;
 
@@ -17,8 +19,27 @@ public static partial class EmuStartupExtensions
 
         ArgumentNullException.ThrowIfNull(emuSection);
 
+        // configure specific HttpClient for calling Experience Edge with custom resiliency policy
+        services.AddHttpClient(StringConstants.EmuHttpClientName).AddResilienceHandler(StringConstants.EmuResiliencePolicyName, builder =>
+        {
+            builder.AddRetry(new HttpRetryStrategyOptions
+            {
+                ShouldHandle = new PredicateBuilder<HttpResponseMessage>()
+                                    .Handle<HttpRequestException>()
+                                    .HandleResult(r => (int)r.StatusCode is 429 or >= 500),
+                BackoffType = DelayBackoffType.Exponential,
+                MaxRetryAttempts = 5,
+                Delay = TimeSpan.FromSeconds(3),
+                UseJitter = true
+            });
+
+            builder.AddTimeout(new HttpTimeoutStrategyOptions()
+            {
+                Timeout = TimeSpan.FromSeconds(30)
+            });
+        });
+
         services.Configure<EmuSettings>(emuSection);
-        services.AddHttpClient();
         services.AddSingleton<EmuFileSystem>();
         services.AddSingleton<InMemoryItemStore>();
         services.AddSingleton<InMemorySiteDataStore>();

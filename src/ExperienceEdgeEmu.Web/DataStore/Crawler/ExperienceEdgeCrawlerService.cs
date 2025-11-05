@@ -424,11 +424,11 @@ public class ExperienceEdgeCrawlerService
             edgeEndpointUri = new Uri(edgeEndpointUrl);
         }
 
-        var httpClient = _httpClientFactory.CreateClient();
+        var httpClient = _httpClientFactory.CreateClient(StringConstants.EmuHttpClientName);
 
         if (!isRealEdgeUri)
         {
-            httpClient.DefaultRequestHeaders.Add("sc_apikey", edgeContextId);
+            httpClient.DefaultRequestHeaders.Add(StringConstants.ScApiKey, edgeContextId);
         }
 
         return new GraphQLHttpClient(
