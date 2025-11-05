@@ -47,18 +47,17 @@ public static partial class EmuStartupExtensions
         services.AddSingleton<IntrospectionToSdlConverter>();
         services.AddScoped<ExperienceEdgeCrawlerService>();
         services.AddSingleton<ItemPostProcessingQueue>();
-        services.AddSingleton<MediaUrlReplacer>();
+        services.AddSingleton<JsonMediaUrlReplacer>();
         services.AddHostedService<ItemPostProcessingWorker>();
         services.AddSingleton<MediaDownloadQueue>();
         services.AddMemoryCache();
         services.AddHostedService<MediaDownloadWorker>();
         services.AddSingleton<FileExtensionContentTypeProvider>();
-        services.AddEmuSchema();
-
+        services.AddSingleton<MediaUrlRewriter>();
         services.AddSingleton<JsonFileChangeQueue>();
         services.AddHostedService<JsonFileWatcherWorker>();
         services.AddHostedService<JsonFileChangeWorker>();
-
+        services.AddEmuSchema();
         services.AddGraphQL(b => b
           .AddSchema<DynamicEmuSchema>()
           .AddSystemTextJson()

@@ -1,12 +1,10 @@
 ﻿using ExperienceEdgeEmu.Web.Media;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace ExperienceEdgeEmu.Web.DataStore.Crawler;
 
-public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProcessingQueue, MediaDownloadQueue mediaDownloadQueue, ILogger<ItemPostProcessingWorker> logger, MediaUrlReplacer mediaUrlReplacer, IOptions<EmuSettings> options) : BackgroundService
+public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProcessingQueue, MediaDownloadQueue mediaDownloadQueue, ILogger<ItemPostProcessingWorker> logger, JsonMediaUrlReplacer mediaUrlReplacer) : BackgroundService
 {
-    private readonly EmuSettings _settings = options.Value;
     private static readonly JsonSerializerOptions _fileWritingJsonSerializerOptions = new() { WriteIndented = true };
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -18,7 +16,7 @@ public partial class ItemPostProcessingWorker(ItemPostProcessingQueue postProces
             try
             {
                 // replace media urls
-                var changes = mediaUrlReplacer.ReplaceMediaUrlsInFields(message.JsonData, _settings.MediaHost);
+                var changes = mediaUrlReplacer.ReplaceMediaUrlsInFields(message.JsonData);
 
                 if (changes.Count > 0)
                 {
