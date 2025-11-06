@@ -112,7 +112,14 @@ jobs:
           docker image push ${{ matrix.repo }}:latest
 
       - name: dotnet publish binary
-        run: dotnet publish ${{ env.PROJECT_PATH }} -c Release -r ${{ matrix.runtime }} --self-contained -p:PublishSingleFile=true -o ./release/${{ matrix.runtime }}
+        run: >
+          dotnet publish ${{ env.PROJECT_PATH }}
+          -c Release
+          -r ${{ matrix.runtime }}
+          --self-contained
+          -p:PublishSingleFile=true
+          -p:EnableCompressionInSingleFile=true
+          -o ./release/${{ matrix.runtime }}
 
       - name: Upload binary artifact
         uses: actions/upload-artifact@v4
